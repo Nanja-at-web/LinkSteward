@@ -17,6 +17,7 @@ import bookmarks from "./routes/bookmarks";
 import feeds from "./routes/feeds";
 import health from "./routes/health";
 import highlights from "./routes/highlights";
+import linkwardenCollections from "./routes/linkwarden/collections";
 import lists from "./routes/lists";
 import metrics, { registerMetrics } from "./routes/metrics";
 import publicRoute from "./routes/public";
@@ -35,6 +36,7 @@ const v1 = new Hono<{
   };
 }>()
   .route("/highlights", highlights)
+  .route("/collections", linkwardenCollections)
   .route("/bookmarks", bookmarks)
   .route("/lists", lists)
   .route("/tags", tags)
