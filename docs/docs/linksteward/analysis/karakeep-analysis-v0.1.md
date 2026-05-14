@@ -960,3 +960,92 @@ Schritt 1: Extension Tables definieren
 Queue-System: NICHT Bull-basiert.
 Korrekt: queue-liteque (SQLite-Plugin) + queue-restate.
 ```
+
+---
+
+## Codex Review Addendum v0.1
+
+### Quelle
+
+- Bestehende finale Analyse: Claude-konsolidiert
+- Ergänzungen in diesem Abschnitt: Codex-Review
+
+### Zusätzliche Codex-Erkenntnisse
+
+- [Codex bestätigt] Die bestehende finale Analyse übernimmt die wichtigsten Codex-Punkte bereits sehr weitgehend: Extension Tables zuerst, Linkwarden-Floccus-Sync als Alpha-Slice, SQLite für Alpha, `@karakeep/*` Namespace beibehalten, keine direkte `bookmarks.deletedAt`-Spalte im ersten Slice.
+
+- [Codex-Ergänzung] Die native LinkSteward API unter `/api/linksteward/v1/*` sollte in v0.1-alpha ausdrücklich als **Post-Alpha bzw. zweiter API-Slice** behandelt werden. Die finale Analyse nennt sie bereits als neu zu bauendes Modul, aber für den ersten Alpha-Scope sollte die Reihenfolge noch härter sein: zuerst Linkwarden-Compat, danach native LinkSteward API.
+
+- [Codex-Ergänzung] `linksteward_sync_events` sollte in der finalen Datenmodell-Diskussion sichtbar bleiben, auch wenn es Post-Alpha ist. Für den ersten Sync reichen vermutlich `item_extensions` und `external_mappings`, aber eine spätere robuste Zwei-Wege-Synchronisation braucht ein Ereignis-/Auditmodell für Konfliktanalyse.
+
+- [Codex-Ergänzung] `packages/shared/types/*` ist ein besonders sensibler Änderungsbereich. Die finale Analyse nennt diesen Punkt bereits in Risiken und Übernahmeempfehlung; Codex würde zusätzlich empfehlen, LinkSteward-spezifische API-Typen konsequent getrennt zu halten, damit Web, Mobile, Extension, CLI und KaraKeep-kompatible REST-Shapes nicht unbeabsichtigt brechen.
+
+- [Codex-Ergänzung] AI-Tags sollten für v0.1-alpha nicht nur "ausblenden oder read-only" sein, sondern als konkrete Alpha-Voreinstellung eher **ausblenden**. Read-only kann später geprüft werden. Der Grund: Floccus-Sync sollte in der ersten Testphase nur Nutzer- bzw. Browser-intendierte Änderungen zurückspiegeln.
+
+- [Codex-Ergänzung] Die Aussage "KaraKeep-UI zeigt gelöschte Items weiterhin an (für Alpha akzeptiert)" sollte als reine Alpha-Einschränkung verstanden werden, nicht als akzeptables Produktverhalten. Für einen öffentlichen MVP braucht es entweder UI-Filterung, Papierkorb-UI oder eine klare Nutzerkommunikation.
+
+### Abweichende Codex-Einschätzungen
+
+- [Codex-Abweichung] Die finale Analyse enthält im Abschnitt "Erster Code-Branch" und "Erster technischer Implementierungsschritt" bereits sehr konkrete Datei- und Befehlsvorschläge. Codex würde diese nicht als beschlossene Umsetzung lesen, sondern als **Implementierungsskizze nach Abschluss der Issues 001-005**. Vorher sollten keine Migrationen oder Routen angelegt werden.
+
+- [Codex-Abweichung] Die Formulierung "Drizzle ORM unterstützt beide; der Wechsel ist später möglich" ist technisch plausibel, aber sollte nicht zu optimistisch gelesen werden. Ein späterer SQLite-zu-PostgreSQL-Wechsel ist [Nicht sicher ableitbar] aus den erlaubten Dateien als einfach ableitbar; Datenmigration, SQL-Dialektunterschiede, Indizes und Runtime-Annahmen können trotzdem erheblich sein.
+
+- [Codex-Abweichung] `linksteward_external_mappings` wird an mehreren Stellen als "für Floccus-ID-Tracking" beschrieben. Codex stimmt der Tabelle als Vorbereitung zu, aber ob sie bereits im ersten Sync aktiv befüllt werden muss, ist [Nicht sicher ableitbar], solange der Floccus-Linkwarden-API-Contract und das Server-ID-Konzept nicht geprüft sind.
+
+### Codex-Korrekturhinweise
+
+- [Codex bestätigt] Queue-System: Die finale Analyse korrigiert den früheren Bull-Hinweis korrekt. Für Implementierung und Dokumentation gilt: `queue-liteque`/`queue-restate`, nicht Bull.
+
+- [Codex bestätigt] `bookmarks.deletedAt` nicht sofort direkt einbauen. Die bestehende Entscheidung "Extension Tables zuerst, direkte Spalte nur nach Review-Gate" bleibt aus Codex-Sicht korrekt.
+
+- [Codex-Korrekturhinweis] Der in der finalen Analyse genannte Befehl `pnpm db:generate --name add_linksteward_base_tables` sollte nicht als sofort auszuführender Schritt verstanden werden. Erst Issue 001 bis 005 klären, dann Migration erzeugen.
+
+- [Codex-Korrekturhinweis] Die erlaubten URL-Schemata, insbesondere `javascript:`, müssen vor Implementierung gegen Floccus geprüft werden. Die finale Analyse enthält diese offene Frage bereits; Codex würde sie als Blocker für den Compatibility Mapper behandeln.
+
+- [Codex-Korrekturhinweis] Meilisearch-Optionalität ist weiterhin [Nicht sicher ableitbar]. Die finale Analyse markiert das korrekt als zu prüfenden Punkt. Keine Docker-/Deployment-Vereinfachung daraus ableiten, bevor Suchpfade geprüft sind.
+
+- [Codex-Korrekturhinweis] Floccus KaraKeep-Modus bleibt [Nicht sicher ableitbar] ohne manuellen Test. Die finale Analyse priorisiert richtig den Linkwarden-Modus; KaraKeep-Modus sollte nicht als Alpha-Annahme eingeplant werden.
+
+### Auswirkungen auf die v0.1-alpha-Entscheidung
+
+- [Codex bestätigt] Codex bestätigt die bestehende v0.1-alpha-Entscheidung vollständig:
+
+```text
+KaraKeep bleibt Basis.
+SQLite bleibt für Alpha.
+@karakeep/* bleibt für Alpha.
+Extension Tables zuerst.
+Linkwarden-Compat zuerst.
+Floccus real testen.
+Keine direkte Kernschema-Erweiterung vor dem ersten erfolgreichen Sync.
+```
+
+- [Codex-Ergänzung] Die einzige praktische Anpassung ist eine stärkere Scope-Grenze: Die native LinkSteward API und detaillierte Post-Alpha-Module (`sync_events`, Duplicate Worker, Link Health Worker, AI Suggestions Workflow) sollten dokumentiert bleiben, aber nicht in den ersten Alpha-Branch rutschen.
+
+- [Codex-Ergänzung] Vor der ersten Codeänderung sollten Issue 001 bis 005 als echte Gates gelten, nicht nur als begleitende Dokumentationsaufgaben.
+
+### Finale Codex-Empfehlung
+
+- [Codex bestätigt] Was unverändert bleibt:
+  - KaraKeep als technische Basis.
+  - SQLite für v0.1-alpha.
+  - `@karakeep/*` Namespace für v0.1-alpha.
+  - Linkwarden-Compat + Floccus Linkwarden-Modus als erster Alpha-Slice.
+  - Extension Tables zuerst.
+  - Kein `bookmarks.deletedAt` im ersten Alpha-Slice.
+  - Queue-System: `queue-liteque`/`queue-restate`, nicht Bull.
+
+- [Codex-Ergänzung] Was ergänzt werden sollte:
+  - Native LinkSteward API ausdrücklich als Post-Alpha/zweiter API-Slice markieren.
+  - `linksteward_sync_events` als Post-Alpha-Baustein für robuste Synchronisation sichtbar halten.
+  - AI-Tags für Alpha bevorzugt aus der Linkwarden-Compat-API ausblenden.
+  - Konkrete Implementierungsskizzen klar als nachgelagert zu Issues 001-005 kennzeichnen.
+
+- [Codex-Korrekturhinweis] Was vor der ersten Codeänderung geprüft werden sollte:
+  - Floccus Linkwarden API Contract inklusive Server-ID-Konzept.
+  - Soft-Delete-Scope: nur Compat-API oder auch KaraKeep UI/API.
+  - Ob `external_mappings` im ersten Sync aktiv gebraucht wird.
+  - URL-Schema-Verhalten, insbesondere `javascript:`.
+  - Meilisearch-Abhängigkeit.
+  - SQLite/WAL-Verhalten bei parallelen API- und Worker-Writes.
+  - Queue-Plugin-Muster für spätere LinkSteward-Worker.
