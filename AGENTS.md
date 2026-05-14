@@ -2,6 +2,45 @@
 
 This document provides context about the Karakeep project for the different agents.
 
+## LinkSteward Context
+
+LinkSteward is a fork of KaraKeep. The project is currently in the v0.1-alpha / early implementation phase.
+
+The final technical analysis and decision basis for the fork is:
+
+- `docs/docs/linksteward/analysis/karakeep-analysis-v0.1.md`
+
+### Binding v0.1-alpha Decisions
+
+These decisions are binding for LinkSteward v0.1-alpha unless the user explicitly asks to revise them:
+
+- KaraKeep remains the technical base.
+- SQLite remains the database for v0.1-alpha.
+- Do not do a PostgreSQL migration before alpha.
+- Keep the `@karakeep/*` namespace for alpha.
+- Do not do a large branding or namespace rename in the first alpha slice.
+- Use Extension Tables first.
+- Do not add a direct `bookmarks.deletedAt` column in the first alpha slice.
+- Build the Linkwarden-compatible API first.
+- Test Floccus in Linkwarden mode first.
+- Treat the KaraKeep-Floccus mode as later work.
+- Implement alpha Soft Delete through `linksteward_item_extensions.deletedAt`.
+- Implement External Mappings through `linksteward_external_mappings`.
+- Filter non-URL items from compatibility APIs.
+- Hide AI-generated tags from Linkwarden compatibility during alpha, or treat them as read-only if explicitly required.
+- The queue system is `queue-liteque` / `queue-restate`, not Bull.
+
+### LinkSteward Agent Safety Rules
+
+- For analysis tasks, do not change source files.
+- Do not install dependencies unless explicitly asked.
+- Do not change `package.json`, `pnpm-lock.yaml`, or migrations unless explicitly asked.
+- Do not perform broad refactors.
+- Keep changes small and reviewable.
+- Before code changes, create or update the relevant plan, ADR, or issue first.
+- After changes, state which tests or build commands should be run, and run them when appropriate for the task.
+- `CLAUDE.md` and `GEMINI.md` are symlinks to `AGENTS.md`; write shared agent instructions only to `AGENTS.md`.
+
 ## Project Overview
 
 Karakeep is a monorepo project managed with Turborepo. It appears to be a web application with a focus on collecting and organizing information, possibly a bookmarking or "read-it-later" service. The project is built with a modern tech stack, including:
