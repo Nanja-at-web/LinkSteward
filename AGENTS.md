@@ -23,7 +23,7 @@ These decisions are binding for LinkSteward v0.1-alpha unless the user explicitl
 - Do not add a direct `bookmarks.deletedAt` column in the first alpha slice.
 - Build the Linkwarden-compatible API first.
 - Test Floccus in Linkwarden mode first.
-- Treat the KaraKeep-Floccus mode as later work.
+- KaraKeep-Floccus mode: basic sync confirmed working out-of-the-box (2026-05-14, Floccus v5.8.6, Firefox). Intensive testing (bidirectional, conflict, large datasets) is deferred. See docs/docs/linksteward/testing/floccus-sync-results-v0.1.md.
 - Implement alpha Soft Delete through `linksteward_item_extensions.deletedAt`.
 - Implement External Mappings through `linksteward_external_mappings`.
 - Filter non-URL items from compatibility APIs.
