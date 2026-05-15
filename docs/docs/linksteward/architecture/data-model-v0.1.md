@@ -1,5 +1,12 @@
 # LinkSteward – Datenmodell / Datenbankschema v0.1
 
+> **Status (v0.1-alpha):** Dieses Dokument beschreibt das angestrebte Zieldatenmodell für LinkSteward.
+> Es entspricht nicht dem aktuellen Ist-Stand. Die technische Basis ist KaraKeep (packages/db/schema.ts).
+> Für v0.1-alpha werden nur additive Extension Tables eingeführt (linksteward_item_extensions,
+> linksteward_external_mappings). Felder wie normalized_url, url_hash, deleted_at auf items-Ebene,
+> duplicate_groups und link_health_checks sind Post-Alpha. Siehe karakeep-analysis-v0.1.md Abschnitt 4
+> und ADR-016/ADR-017.
+
 ## Designziele
 
 ```text
