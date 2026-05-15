@@ -41,6 +41,24 @@ These decisions are binding for LinkSteward v0.1-alpha unless the user explicitl
 - After changes, state which tests or build commands should be run, and run them when appropriate for the task.
 - `CLAUDE.md` and `GEMINI.md` are symlinks to `AGENTS.md`; write shared agent instructions only to `AGENTS.md`.
 
+## Commit Discipline
+
+Rules for autonomous agents when committing changes:
+
+- Each autonomous task must end in its own Git commit.
+- Do not bundle unrelated changes into one commit. One task / one topic / one commit.
+- Run `git status` before starting a task to know the baseline.
+- Run `git status`, `git diff --stat`, and `git diff` before committing to review all changes.
+- Only stage files that belong to the current task.
+- Run the checks required by the task (typecheck, lint, tests) before committing. If checks fail, do not commit.
+- Do not commit `package.json`, `pnpm-lock.yaml`, migrations, config files, generated files, or dependency changes unless explicitly requested.
+- If unexpected files appear in `git status` or `git diff`, stop and report the unexpected changes instead of committing.
+- After committing, run `git status` again and confirm the working tree is clean.
+
+Ein autonomer Agent darf mehrere unabhängige Aufgaben nicht in einem einzigen Commit bündeln.
+Wenn unerwartete Dateien geändert wurden, muss der Agent stoppen und die unerwarteten Änderungen
+melden – er darf sie nicht stillschweigend mit committen.
+
 ## Project Overview
 
 Karakeep is a monorepo project managed with Turborepo. It appears to be a web application with a focus on collecting and organizing information, possibly a bookmarking or "read-it-later" service. The project is built with a modern tech stack, including:
