@@ -52,6 +52,21 @@ LinkSteward
 
 > **Datenbank:** SQLite (better-sqlite3, WAL-Modus). Kein PostgreSQL in v0.1-alpha. Siehe ADR-016.
 
+## Implementierungsstand v0.1-alpha
+
+Linkwarden Compatibility API (implementiert):
+
+- `GET /api/v1/collections` – read-only, manuelle Listen, E2E-getestet
+
+Linkwarden Compatibility API (ausstehend):
+
+- `GET /api/v1/links` – read-only, Link-Bookmarks (links.ts noch nicht erstellt)
+- `POST/PATCH/DELETE /api/v1/collections`
+- `POST/PATCH/DELETE /api/v1/links`
+- Linkwarden-Floccus-Modus-Test
+
+Vollständiger Endpunkte-Katalog: `docs/docs/linksteward/architecture/api-spec-v0.1.md`
+
 ## Docker Services
 
 ```text
