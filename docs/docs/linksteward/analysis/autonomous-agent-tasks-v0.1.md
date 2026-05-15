@@ -11,9 +11,11 @@
 > Nicht enthalten: Aufgaben mit Browser-Test, Floccus-Test, Auth-Änderung,
 >   POST/PATCH/DELETE-Endpunkten, Migrations, Löschlogik oder unklarer Korrektheit.
 >
-> Repo-Stand geprüft: 2026-05-15
-> - packages/api/routes/linkwarden/collections.ts – ✅ existiert
-> - packages/api/routes/linkwarden/links.ts       – ❌ existiert nicht (GET /api/v1/links nicht aktiv)
+> Repo-Stand geprüft: 2026-05-15 (aktualisiert 2026-05-15)
+> - packages/api/routes/linkwarden/collections.ts              – ✅ existiert (E2E-getestet)
+> - packages/api/routes/linkwarden/links.ts                    – ✅ existiert (implementiert und E2E-getestet)
+> - packages/e2e_tests/tests/api/linkwarden-collections.test.ts – ✅ existiert
+> - packages/e2e_tests/tests/api/linkwarden-links.test.ts       – ✅ existiert
 
 ---
 
@@ -175,7 +177,7 @@ Die Antworten sind aus bestehenden Dokumenten ableitbar:
 - Implementierungsentscheidungen: linkwarden-compat-implementation-plan (in Analysis),
   adr/018, AGENTS.md
 - Implementierter Stand: packages/api/routes/linkwarden/collections.ts (GET /api/v1/collections)
-- GET /api/v1/links ist noch **nicht implementiert** (links.ts existiert nicht, 2026-05-15)
+- GET /api/v1/links ist implementiert (links.ts vorhanden, 2026-05-15)
 - Offene Teile (Floccus-Test) sind klar als noch offen erkennbar.
 
 **Voraussetzung:** Keine. Working Tree muss sauber sein.
@@ -198,9 +200,6 @@ Lies packages/api/routes/linkwarden/collections.ts.
 Prüfe ob packages/api/routes/linkwarden/links.ts existiert.
 Lies docs/docs/linksteward/testing/floccus-sync-results-v0.1.md.
 
-WICHTIG: links.ts existiert möglicherweise nicht. Prüfe das zuerst und passe den
-"Implementierter Alpha-Stand" entsprechend an.
-
 Ersetze den Abschnitt "## Offene Fragen" mit einem aktualisierten Stand.
 Format: für jede Frage den Stand (beantwortet / teilweise / noch offen) und eine kurze Begründung.
 
@@ -215,15 +214,15 @@ Faktengrundlage:
 
 3. "Wie werden Tags/Collections gemappt?"
    → Teilweise entschieden: nur manuelle Listen als Collections (kein Smart-List-Export).
-     AI-Tag-Filterung (attachedBy="human") ist als Anforderung festgelegt, aber noch nicht
-     implementiert (links.ts fehlt). Verifizierung mit Floccus steht aus.
+     AI-Tag-Filterung (attachedBy="human") ist als Anforderung festgelegt und in links.ts
+     implementiert. Verifizierung mit Floccus steht aus.
 
 4. "Welche Linkwarden-Exportformate sollen importiert werden?"
    → Noch offen. Sprint 5 (Import/Export). Kein Alpha-Thema.
 
 Füge unter den Offene-Fragen-Abschnitt einen neuen Abschnitt "## Implementierter Alpha-Stand" ein:
 - GET /api/v1/collections (read-only, manuelle Listen) – implementiert
-- GET /api/v1/links – noch nicht implementiert (links.ts fehlt, Stand 2026-05-15)
+- GET /api/v1/links – implementiert (links.ts vorhanden, Stand 2026-05-15)
 
 Ändere sonst nichts am Dokument.
 
@@ -273,7 +272,7 @@ Füge am Ende der Datei einen neuen Abschnitt ein:
 ### Linkwarden-Modus
 - Status: ⬜ Noch nicht getestet
 - GET /api/v1/collections ist implementiert.
-- GET /api/v1/links ist noch nicht implementiert (links.ts fehlt, Stand 2026-05-15).
+- GET /api/v1/links ist implementiert (links.ts vorhanden, Stand 2026-05-15).
 - Floccus-Verbindungstest steht aus.
 
 Ändere sonst nichts am Dokument.
@@ -285,8 +284,6 @@ Wenn weitere Dateien geändert sind: Stoppen und melden.
 ---
 
 ## Gruppe 2 – Tests für bestehende read-only Endpunkte
-
-> **Empfohlener nächster autonomer Schritt: TASK-05**
 
 ---
 
@@ -356,6 +353,34 @@ Wenn typecheck grün:
 
 ---
 
+### TASK-06: E2E-Test für GET /api/v1/links schreiben ✅ Erledigt (2026-05-15)
+
+**Status:** ✅ Erledigt. `packages/e2e_tests/tests/api/linkwarden-links.test.ts` existiert.
+
+**Umgesetzte Testfälle (10):**
+1. 401 ohne Auth-Header
+2. 200 mit gültigem Bearer API-Key
+3. Response enthält `response` als Array
+4. Link-Bookmark erscheint in `response`
+5. Text-Bookmark erscheint **nicht** in `response`
+6. Jedes Element hat `id`, `name`, `url`, `tags` (Array)
+7. Human-Tags erscheinen in `tags`
+8. AI-Tags erscheinen **nicht** in `tags`
+9. `collection` ist gesetzt, wenn Bookmark in manueller Liste
+10. `collection` ist `null`, wenn Bookmark in keiner Liste
+
+**Offene E2E-Abdeckung (TODO):**
+URL-Schema-Filter (`javascript:`, `data:`, `chrome:`, `chrome-extension:`, `about:`, `file:`,
+`moz-extension:`, `edge:`) sind im Endpoint (`links.ts`) vorhanden und aktiv. Der E2E-Test
+enthält dafür noch keinen Testfall, weil unklar ist, ob die Bookmark-Creation-API solche URLs
+akzeptiert. Als TODO-Kommentar in der Testdatei dokumentiert. Benötigt gesonderte Untersuchung
+vor Implementierung des Testfalls.
+
+**Linkwarden-Floccus-Modus:** Noch nicht manuell getestet – nicht autonom durchführbar.
+POST/PATCH/DELETE bleiben ausstehend.
+
+---
+
 ## Gruppe 3 – Code-Kommentare (bestehende Endpunkte)
 
 ---
@@ -414,6 +439,60 @@ Wenn typecheck grün:
 
 ---
 
+### TASK-07: Erklärungskommentar in links.ts ergänzen
+
+**Ziel:**
+`packages/api/routes/linkwarden/links.ts` enthält komplexe Join-Logik und einen
+URL-Schema-Filter. Diese sind ohne Kontext schwer nachvollziehbar. Ein kurzer Kommentar
+pro Block verbessert die Lesbarkeit für zukünftige Agents und Reviewer.
+
+**Warum autonom möglich:**
+Reine Kommentar-Ergänzung, kein Logik-Change. Korrektheit ist durch den bestehenden Code
+und die Entscheidungsdokumente klar. AGENTS.md erlaubt Kommentare wenn das WHY
+nicht offensichtlich ist.
+
+**Voraussetzung:**
+- `packages/api/routes/linkwarden/links.ts` existiert – ✅ bestätigt (2026-05-15)
+- Working Tree muss sauber sein
+
+**Betroffene Dateien:**
+- `packages/api/routes/linkwarden/links.ts`
+
+**Erlaubte Änderungen:** Ausschließlich Kommentar-Zeilen in links.ts. Keine Logik-Änderungen.
+**Verboten:** Alle anderen Dateien, Logik-Änderungen, Import-Änderungen.
+
+**Risiko:** niedrig
+**Code geändert:** ja (Kommentare)
+**Tests automatisch ausführbar:** ja – `pnpm --filter @karakeep/api typecheck`
+
+**Umsetzungsprompt:**
+```
+Lies packages/api/routes/linkwarden/links.ts vollständig.
+Lies AGENTS.md (Kommentar-Regeln: nur WHY, nicht WHAT).
+
+Ergänze kurze Kommentare an zwei Stellen:
+
+1. Über EXCLUDED_URL_PREFIXES:
+   // Schemes meaningless outside the originating browser profile; see floccus-compatibility-analysis-v0.1.md
+
+2. Über der for-Schleife (Aggregation):
+   // Left joins produce one row per (tag × list) per bookmark.
+   // Aggregate back to one object per bookmark; collect unique human tags, take first manual list seen.
+
+Halte dich streng an die zwei Stellen. Keine weiteren Kommentare, keine Logik-Änderungen.
+
+Führe aus:
+  pnpm --filter @karakeep/api typecheck
+
+Wenn typecheck grün:
+  git status  → darf nur links.ts zeigen
+  git diff    → nur Kommentar-Zeilen
+  Wenn andere Dateien geändert oder Logik-Änderungen: Stoppen und melden.
+  Dann committen.
+```
+
+---
+
 ## Gruppe 4 – Möglich, aber besser zuerst reviewed
 
 ---
@@ -423,7 +502,7 @@ Wenn typecheck grün:
 **Ziel:**
 Die Systemübersicht in `architecture-v0.1.md` zeigt drei API-Schichten (Native, Linkwarden,
 KaraKeep), aber listet keine konkreten implementierten Endpunkte. Eine kurze
-Ergänzung mit dem aktuellen Stand (GET /collections) und Link zur api-spec
+Ergänzung mit dem aktuellen Stand (GET /collections, GET /links) und Link zur api-spec
 würde die Übersicht aktuell halten.
 
 **Warum nur mit Review:**
@@ -459,12 +538,13 @@ Passe die Liste unten an den tatsächlichen Stand an.
 Füge nach der Systemübersicht einen Abschnitt "## Implementierungsstand v0.1-alpha" ein:
 
   Linkwarden Compatibility API (implementiert):
-  - GET /api/v1/collections  (read-only, manuelle Listen)
+  - GET /api/v1/collections  (read-only, manuelle Listen, E2E-getestet)
+  - GET /api/v1/links         (read-only, Link-Bookmarks, E2E-getestet)
 
   Linkwarden Compatibility API (ausstehend):
-  - GET /api/v1/links         (read-only, Link-Bookmarks – links.ts noch nicht erstellt)
   - POST/PATCH/DELETE /api/v1/collections
   - POST/PATCH/DELETE /api/v1/links
+  - Linkwarden-Floccus-Modus-Test
 
   Vollständiger Endpunkte-Katalog: docs/docs/linksteward/architecture/api-spec-v0.1.md
 
@@ -476,172 +556,24 @@ Wenn weitere Dateien geändert sind: Stoppen und melden.
 
 ---
 
-## Später autonom ausführbar – nach GET /api/v1/links
-
-> Diese Aufgaben setzen voraus, dass `packages/api/routes/linkwarden/links.ts` existiert
-> und die Route in `packages/api/index.ts` unter `.route("/links", linkwardenLinks)` registriert ist.
->
-> Stand 2026-05-15: links.ts existiert **nicht**. Diese Tasks sind gesperrt bis die Datei
-> erstellt und in index.ts eingetragen wurde.
-
----
-
-### TASK-06: E2E-Test für GET /api/v1/links schreiben
-
-**Ziel:**
-Die Route `GET /api/v1/links` hat keinen automatisierten Test.
-Sie hat mehr Filterlogik als collections (Typ-Filter, AI-Tag-Filter, URL-Schema-Filter,
-Pagination) – das macht automatisierte Tests besonders wertvoll.
-
-**Warum autonom möglich (sobald Voraussetzung erfüllt):**
-- Alle Filterregeln sind im Code (`links.ts`) und in AGENTS.md klar definiert.
-- Text- und Asset-Bookmarks lassen sich mit dem SDK erstellen und der Ausschluss testbar machen.
-- AI-Tag-Filterung ist durch `attachedBy` steuerbar.
-- Pagination mit `?page=0` ist rein serverseitige Logik.
-- Die URL-Schema-Filter-Testfälle mit `data:` oder `chrome:` URLs sind deterministisch.
-- Kein Browser, kein Floccus, kein manueller Schritt.
-
-**Voraussetzung:**
-- `packages/api/routes/linkwarden/links.ts` muss existieren – ❌ fehlt (Stand 2026-05-15)
-- Route muss in packages/api/index.ts registriert sein
-- Working Tree muss sauber sein
-
-**Betroffene Dateien:**
-- `packages/e2e_tests/tests/api/linkwarden-links.test.ts` (neu)
-
-**Erlaubte Änderungen:** Ausschließlich die neue Testdatei.
-**Verboten:** Alle anderen Dateien. Kein neues Package, keine neuen Dependencies.
-
-**Risiko:** niedrig (sobald Voraussetzung erfüllt)
-**Code geändert:** ja (neue Testdatei)
-**Tests automatisch ausführbar:** ja – `pnpm --filter @karakeep/e2e_tests typecheck` und `pnpm test`
-
-**Umsetzungsprompt:**
-```
-Prüfe zuerst: existiert packages/api/routes/linkwarden/links.ts?
-Wenn nein: Aufgabe abbrechen und melden.
-
-Lies packages/e2e_tests/tests/api/bookmarks.test.ts als Vorlage.
-Lies packages/e2e_tests/utils/api.ts für createTestUser().
-Lies packages/api/routes/linkwarden/links.ts vollständig für die Route-Logik.
-Lies AGENTS.md für die gültigen Filterregeln.
-
-Erstelle packages/e2e_tests/tests/api/linkwarden-links.test.ts.
-
-Nutze raw fetch (nicht den KaraKeep SDK).
-URL-Muster: http://localhost:${port}/api/v1/links
-
-Testfälle:
-1. Ohne Auth-Header → 401
-2. Mit gültigem Bearer API-Key, keine Bookmarks → 200, { response: [], nextPage: null }
-3. Ein Link-Bookmark erstellen (type: "link") → erscheint in response
-4. Ein Text-Bookmark erstellen (type: "text") → erscheint NICHT in response
-5. response-Elemente haben mindestens: id, name, url, tags (Array), createdAt, updatedAt
-6. collection ist null oder { id, name }
-7. Tags: Bookmark mit human-Tag erstellen → Tag erscheint in response.tags
-8. Pagination: Mehr als 20 Link-Bookmarks erstellen → nextPage ist nicht null bei page=0,
-   page=1 liefert weitere Bookmarks
-9. collectionId-Filter: Liste erstellen, Bookmark der Liste zuordnen,
-   GET /links?collectionId=<listId> → nur dieser Bookmark erscheint
-10. URL-Schema-Filter: Bookmark mit URL "data:text/plain,test" erstellen
-    → erscheint NICHT in response (ausgefiltertes Schema)
-11. Kein AI-Tag: Bookmark mit tagsOnBookmarks.attachedBy="ai" (via direkte DB oder
-    über tRPC-Caller wenn verfügbar) → AI-Tag erscheint NICHT in response.tags
-
-Nutze beforeEach mit createTestUser().
-Kein neues Package, keine neuen Dependencies.
-
-Führe nach dem Schreiben aus:
-  pnpm --filter @karakeep/e2e_tests typecheck
-
-Wenn typecheck grün:
-  git status      → darf nur die neue Testdatei zeigen
-  git diff --stat → nur die neue Testdatei
-  Wenn andere Dateien geändert: Stoppen und melden.
-  Dann committen.
-```
-
----
-
-### TASK-07: Erklärungskommentar in links.ts ergänzen
-
-**Ziel:**
-`packages/api/routes/linkwarden/links.ts` enthält komplexe CTE-Logik und einen
-URL-Schema-Filter. Diese sind ohne Kontext schwer nachvollziehbar. Ein kurzer Kommentar
-pro Block verbessert die Lesbarkeit für zukünftige Agents und Reviewer.
-
-**Warum autonom möglich (sobald Voraussetzung erfüllt):**
-Reine Kommentar-Ergänzung, kein Logik-Change. Korrektheit ist durch den bestehenden Code
-und die Entscheidungsdokumente klar. AGENTS.md erlaubt Kommentare wenn das WHY
-nicht offensichtlich ist.
-
-**Voraussetzung:**
-- `packages/api/routes/linkwarden/links.ts` muss existieren – ❌ fehlt (Stand 2026-05-15)
-- Working Tree muss sauber sein
-
-**Betroffene Dateien:**
-- `packages/api/routes/linkwarden/links.ts`
-
-**Erlaubte Änderungen:** Ausschließlich Kommentar-Zeilen in links.ts. Keine Logik-Änderungen.
-**Verboten:** Alle anderen Dateien, Logik-Änderungen, Import-Änderungen.
-
-**Risiko:** niedrig (sobald Voraussetzung erfüllt)
-**Code geändert:** ja (Kommentare)
-**Tests automatisch ausführbar:** ja – `pnpm --filter @karakeep/api typecheck`
-
-**Umsetzungsprompt:**
-```
-Prüfe zuerst: existiert packages/api/routes/linkwarden/links.ts?
-Wenn nein: Aufgabe abbrechen und melden.
-
-Lies packages/api/routes/linkwarden/links.ts vollständig.
-Lies AGENTS.md (Kommentar-Regeln: nur WHY, nicht WHAT).
-
-Ergänze kurze Kommentare an drei Stellen:
-
-1. Über EXCLUDED_URL_SCHEMES:
-   // Schemes meaningless outside the originating browser profile; see api-spec-v0.1.md
-
-2. Über dem if/else für cteSq (collectionId-Branch):
-   // collectionId filter must live inside the CTE so LIMIT/OFFSET applies to the correct subset.
-   // A post-CTE WHERE on the outer join would break pagination correctness.
-
-3. Über der for-Schleife (Aggregation):
-   // Left joins produce one row per (tag × list) per bookmark.
-   // Aggregate back to one object per bookmark; collect unique tags, take first collection seen.
-
-Halte dich streng an die drei Stellen. Keine weiteren Kommentare, keine Logik-Änderungen.
-
-Führe aus:
-  pnpm --filter @karakeep/api typecheck
-
-Wenn typecheck grün:
-  git status  → darf nur links.ts zeigen
-  git diff    → nur Kommentar-Zeilen
-  Wenn andere Dateien geändert oder Logik-Änderungen: Stoppen und melden.
-  Dann committen.
-```
-
----
-
 ### TASK-09: Linkwarden Response-Shape in schemas.ts extrahieren
 
 **Ziel:**
-Die Antwort-Interfaces (`LinkTag`, `LinkCollection`, `LinkResponse`) in `links.ts` sind
+Die Antwort-Interfaces (`LinkItem`, die `tags`- und `collection`-Typen) in `links.ts` sind
 datei-lokal. Wenn später `/api/v1/links/:id`, `/api/v1/tags` oder andere Linkwarden-Routen
 hinzukommen, werden dieselben Shapes gebraucht. Extraktion in
 `packages/api/routes/linkwarden/schemas.ts` verhindert Duplizierung.
 
-**Warum nur mit Review (und erst nach links.ts):**
-- links.ts existiert noch nicht (Stand 2026-05-15).
-- Der genaue Response-Shape ist noch nicht gegen Floccus verifiziert.
-- Besser nach dem ersten erfolgreichen Floccus-Test, wenn feststeht welche Felder
-  wirklich gebraucht werden.
+**Warum nur mit Review:**
+- Der genaue Response-Shape ist noch nicht gegen Floccus in Linkwarden-Modus verifiziert.
+- Besser nach dem ersten erfolgreichen Floccus-Linkwarden-Test, wenn feststeht welche Felder
+  wirklich gebraucht werden und ob sich der Shape noch ändert.
+- Extraktion jetzt würde schemas.ts evtl. kurz nach Erstellung wieder umbenennen müssen.
 
 **Voraussetzung:**
-- `packages/api/routes/linkwarden/links.ts` muss existieren – ❌ fehlt (Stand 2026-05-15)
-- TASK-06 (E2E-Test) empfohlen vorher, damit der Response-Shape als stabil gilt
-- Floccus Linkwarden-Modus-Test sollte abgeschlossen sein
+- `packages/api/routes/linkwarden/links.ts` existiert – ✅ bestätigt (2026-05-15)
+- TASK-06 (E2E-Test) abgeschlossen – ✅ (2026-05-15)
+- Floccus Linkwarden-Modus-Test sollte abgeschlossen sein – ⬜ ausstehend
 - Working Tree muss sauber sein
 
 **Betroffene Dateien:**
@@ -651,18 +583,15 @@ hinzukommen, werden dieselben Shapes gebraucht. Extraktion in
 **Erlaubte Änderungen:** schemas.ts (neu) und links.ts (nur Import-Zeilen anpassen).
 **Verboten:** Alle anderen Dateien, Logik-Änderungen in links.ts.
 
-**Risiko:** niedrig-mittel (sobald Voraussetzungen erfüllt)
+**Risiko:** niedrig-mittel (sobald Floccus-Test abgeschlossen)
 **Code geändert:** ja
 **Tests automatisch ausführbar:** ja – `pnpm --filter @karakeep/api typecheck && pnpm lint`
 
 **Umsetzungsprompt:**
 ```
-Prüfe zuerst: existiert packages/api/routes/linkwarden/links.ts?
-Wenn nein: Aufgabe abbrechen und melden.
-
 Lies packages/api/routes/linkwarden/links.ts.
 Erstelle packages/api/routes/linkwarden/schemas.ts mit den Interfaces
-LinkTag, LinkCollection, LinkResponse (ohne Implementierungslogik).
+aus links.ts (LinkItem und die Inline-Typen für tags/collection, ohne Implementierungslogik).
 Importiere sie in links.ts statt der lokalen Definitionen.
 
 Führe aus:
@@ -685,7 +614,6 @@ Rückmeldung, manuelle Tests oder unsichere Korrektheit erfordern:
 
 | Aufgabe | Grund für Ausschluss |
 |---|---|
-| GET /api/v1/links implementieren (links.ts erstellen) | Braucht Design-Review; ist Voraussetzung für TASK-06/07/09 |
 | Floccus Linkwarden-Modus testen | Braucht Browser + echten Floccus-Client |
 | Response-Shape gegen Floccus verifizieren | Braucht Floccus-Traffic-Beobachtung |
 | POST /api/v1/collections implementieren | Schreib-Endpunkt, braucht ADR-018-Review-Gate |
@@ -698,3 +626,4 @@ Rückmeldung, manuelle Tests oder unsichere Korrektheit erfordern:
 | Broken-Link-Monitor | Noch nicht implementiert, Sprint 10 |
 | ADR-018 Review-Gate bewerten | Fachliche Entscheidung, braucht Floccus-Test-Ergebnis |
 | Migrationen generieren | Nur zusammen mit expliziter Schema-Änderung |
+| E2E-Test für URL-Schema-Filter (links.ts) | Unklar ob Bookmark-API solche URLs akzeptiert; als TODO im Testfile dokumentiert |
