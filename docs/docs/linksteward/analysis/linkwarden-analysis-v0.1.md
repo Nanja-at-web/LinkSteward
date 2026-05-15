@@ -38,9 +38,45 @@ Post-MVP
 
 ## Offene Fragen
 
-```text
-├─ Wie exakt muss Linkwarden API für Floccus nachgebildet werden?
-├─ Welche Felder erwartet Floccus tatsächlich?
-├─ Wie werden Tags/Collections gemappt?
-└─ Welche Linkwarden-Exportformate sollen importiert werden?
-```
+### 1. Wie exakt muss Linkwarden API für Floccus nachgebildet werden?
+
+**Stand: noch offen**
+
+`GET /api/v1/collections` ist implementiert. Der Response-Contract (Felder, Paginierung,
+Fehlerformate) ist noch nicht gegen einen echten Floccus-Linkwarden-Modus-Test verifiziert.
+Erst nach dem ersten realen Floccus-Sync ist klar, welche API-Details exakt eingehalten
+werden müssen. Siehe ADR-018 Review-Gate.
+
+### 2. Welche Felder erwartet Floccus tatsächlich?
+
+**Stand: noch offen**
+
+Implementierter Minimalansatz für `GET /api/v1/collections`: `id`, `name`, `parentId`.
+Dieser Ansatz basiert auf der bekannten Linkwarden-API-Struktur, ist aber noch nicht mit
+echtem Floccus-Traffic verifiziert. Die tatsächlichen Pflichtfelder sind erst durch einen
+Floccus-Linkwarden-Modus-Test nachweisbar.
+
+### 3. Wie werden Tags/Collections gemappt?
+
+**Stand: teilweise entschieden**
+
+Collections: Nur manuelle Listen werden als Collections exportiert, Smart-Listen werden
+ausgeschlossen. Entschieden durch ADR-018, implementiert in `GET /api/v1/collections`.
+
+Tags: AI-Tag-Filterung (nur `attachedBy="human"` Tags) ist als Anforderung festgelegt
+(AGENTS.md, ADR-018), aber noch nicht implementiert — `GET /api/v1/links` fehlt
+(links.ts existiert nicht, Stand 2026-05-15). Verifizierung mit Floccus steht aus.
+
+### 4. Welche Linkwarden-Exportformate sollen importiert werden?
+
+**Stand: noch offen**
+
+Kein Alpha-Thema. Import/Export ist Sprint 5. Keine Entscheidung getroffen.
+
+---
+
+## Implementierter Alpha-Stand
+
+- `GET /api/v1/collections` (read-only, manuelle Listen) – implementiert
+  - E2E-Test: `packages/e2e_tests/tests/api/linkwarden-collections.test.ts`
+- `GET /api/v1/links` – noch nicht implementiert (links.ts fehlt, Stand 2026-05-15)
