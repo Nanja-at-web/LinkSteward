@@ -41,7 +41,7 @@ LinkSteward
 │  ├─ Reader Extraction
 │  ├─ PDF optional
 │  └─ Single HTML optional
-├─ PostgreSQL
+├─ SQLite
 ├─ Meilisearch
 ├─ Storage
 ├─ Ollama optional
@@ -50,6 +50,8 @@ LinkSteward
    └─ Proxmox LXC
 ```
 
+> **Datenbank:** SQLite (better-sqlite3, WAL-Modus). Kein PostgreSQL in v0.1-alpha. Siehe ADR-016.
+
 ## Docker Services
 
 ```text
@@ -57,7 +59,6 @@ Docker Services
 ├─ linksteward-web
 ├─ linksteward-worker
 ├─ linksteward-browser
-├─ postgres
 ├─ meilisearch
 ├─ ollama, optional
 └─ reverse-proxy, optional extern
