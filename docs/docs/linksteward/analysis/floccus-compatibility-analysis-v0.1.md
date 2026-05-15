@@ -72,3 +72,19 @@ chrome-extension:
 ## Sicherheitsregel
 
 Floccus-Sync-Löschungen werden in LinkSteward als Soft Delete verarbeitet.
+
+## Testergebnisse v0.1-alpha
+
+### KaraKeep-Modus (2026-05-14)
+
+- Floccus v5.8.6, Firefox Desktop
+- Status: ✅ Verbindung und Basis-Sync bestätigt ("Alles gut")
+- Details: docs/docs/linksteward/testing/floccus-sync-results-v0.1.md
+- Intensiver Test (bidirektional, Konflikt, große Datensätze) steht aus.
+
+### Linkwarden-Modus
+
+- Status: ⬜ Noch nicht getestet
+- GET /api/v1/collections ist implementiert.
+- GET /api/v1/links ist noch nicht implementiert (links.ts fehlt, Stand 2026-05-15).
+- Floccus-Verbindungstest steht aus.
