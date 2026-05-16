@@ -64,8 +64,8 @@ Collections: Nur manuelle Listen werden als Collections exportiert, Smart-Listen
 ausgeschlossen. Entschieden durch ADR-018, implementiert in `GET /api/v1/collections`.
 
 Tags: AI-Tag-Filterung (nur `attachedBy="human"` Tags) ist als Anforderung festgelegt
-(AGENTS.md, ADR-018), aber noch nicht implementiert — `GET /api/v1/links` fehlt
-(links.ts existiert nicht, Stand 2026-05-15). Verifizierung mit Floccus steht aus.
+(AGENTS.md, ADR-018) und in `GET /api/v1/links` implementiert. URL-Schema-Filter sind
+ebenfalls implementiert; E2E-Testabdeckung dafür ist noch TODO. Verifizierung mit Floccus steht aus.
 
 ### 4. Welche Linkwarden-Exportformate sollen importiert werden?
 
@@ -79,4 +79,6 @@ Kein Alpha-Thema. Import/Export ist Sprint 5. Keine Entscheidung getroffen.
 
 - `GET /api/v1/collections` (read-only, manuelle Listen) – implementiert
   - E2E-Test: `packages/e2e_tests/tests/api/linkwarden-collections.test.ts`
-- `GET /api/v1/links` – noch nicht implementiert (links.ts fehlt, Stand 2026-05-15)
+- `GET /api/v1/links` – implementiert, E2E-getestet (10 Testfälle)
+  - E2E-Test: `packages/e2e_tests/tests/api/linkwarden-links.test.ts`
+  - URL-Schema-Filter im Endpoint vorhanden; E2E-Abdeckung dafür noch TODO

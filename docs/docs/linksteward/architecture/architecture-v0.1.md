@@ -57,10 +57,10 @@ LinkSteward
 Linkwarden Compatibility API (implementiert):
 
 - `GET /api/v1/collections` – read-only, manuelle Listen, E2E-getestet
+- `GET /api/v1/links` – read-only, Link-Bookmarks, E2E-getestet (URL-Schema-Filter vorhanden; E2E-Abdeckung dafür TODO)
 
 Linkwarden Compatibility API (ausstehend):
 
-- `GET /api/v1/links` – read-only, Link-Bookmarks (links.ts noch nicht erstellt)
 - `POST/PATCH/DELETE /api/v1/collections`
 - `POST/PATCH/DELETE /api/v1/links`
 - Linkwarden-Floccus-Modus-Test

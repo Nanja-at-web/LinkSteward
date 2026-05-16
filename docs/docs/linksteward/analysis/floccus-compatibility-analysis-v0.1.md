@@ -86,5 +86,5 @@ Floccus-Sync-Löschungen werden in LinkSteward als Soft Delete verarbeitet.
 
 - Status: ⬜ Noch nicht getestet
 - GET /api/v1/collections ist implementiert.
-- GET /api/v1/links ist noch nicht implementiert (links.ts fehlt, Stand 2026-05-15).
+- GET /api/v1/links ist implementiert und E2E-getestet (10 Testfälle). URL-Schema-Filter im Endpoint vorhanden; E2E-Abdeckung dafür noch TODO.
 - Floccus-Verbindungstest steht aus.
