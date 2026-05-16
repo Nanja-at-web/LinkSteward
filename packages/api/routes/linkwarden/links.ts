@@ -17,6 +17,7 @@ import { authMiddleware } from "../../middlewares/auth";
 // is based on known Linkwarden API structure but not yet verified against a live
 // Floccus Linkwarden-mode client. See docs/docs/linksteward/analysis/floccus-compatibility-analysis-v0.1.md.
 
+// Schemes meaningless outside the originating browser profile; see floccus-compatibility-analysis-v0.1.md
 const EXCLUDED_URL_PREFIXES = [
   "javascript:",
   "data:",
@@ -83,6 +84,8 @@ const app = new Hono().use(authMiddleware).get("/", async (c) => {
 
   const itemMap = new Map<string, LinkItem>();
 
+  // Left joins produce one row per (tag × list) per bookmark.
+  // Aggregate back to one object per bookmark; collect unique human tags, take first manual list seen.
   for (const row of rows) {
     let item = itemMap.get(row.bookmarkId);
     if (!item) {
